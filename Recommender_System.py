@@ -10,8 +10,14 @@ from scipy.sparse import csr_matrix
 from implicit.als import AlternatingLeastSquares
 
 # Load dataset
-movies = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/tmdb_5000_movies.csv')
-credits = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/compressed_data.csv.gz')
+file_url1 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/tmdb_5000_movies.csv"
+movies = pd.read_csv(file_url1)
+
+file_url2 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/compressed_data.csv.gz"
+credits = pd.read_csv(file_url2)
+
+# movies = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/tmdb_5000_movies.csv')
+# credits = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/compressed_data.csv.gz')
 
 # Merge datasets
 movies = movies.merge(credits, on='title')
