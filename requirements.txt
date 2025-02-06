@@ -1,3 +1,8 @@
+pandas
+numpy
 scikit-learn
-pip install implicit
+nltk
+scipy
 implicit
+streamlit
+
