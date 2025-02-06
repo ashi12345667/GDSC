@@ -122,3 +122,35 @@ def hybrid_recommendation(user_id, movie_title, num_recommendations=5):
     
     hybrid_recs = list(set(content_recs + list(cf_recs)))[:num_recommendations]
     return hybrid_recs
+
+import streamlit as st
+st.title("🎬 Movie Recommender System")
+
+st.sidebar.header("Choose Recommendation Type")
+rec_type = st.sidebar.selectbox("Select Type", ["Content-Based", "Collaborative (Implicit)", "Hybrid"])
+
+if rec_type == "Content-Based":
+    movie_title = st.selectbox("Select a Movie", movies['title'].values)
+    if st.button("Recommend"):
+        recommendations = recommend_content(movie_title)
+        st.write("### Recommended Movies:")
+        for movie in recommendations:
+            st.write(f"✅ {movie}")
+
+elif rec_type == "Collaborative (Implicit)":
+    user_id = st.number_input("Enter User ID", min_value=1, max_value=int(interaction_matrix['user_id'].max()), step=1)
+    if st.button("Recommend"):
+        recommendations = recommend_cf(user_id)
+        st.write("### Recommended Movies:")
+        for movie in recommendations:
+            st.write(f"✅ {movie}")
+
+elif rec_type == "Hybrid":
+    user_id = st.number_input("Enter User ID", min_value=1, max_value=int(interaction_matrix['user_id'].max()), step=1)
+    movie_title = st.selectbox("Select a Movie", movies['title'].values)
+    if st.button("Recommend"):
+        recommendations = hybrid_recommendation(user_id, movie_title)
+        st.write("### Recommended Movies:")
+        for movie in recommendations:
+            st.write(f"✅ {movie}")
+
