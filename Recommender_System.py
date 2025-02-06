@@ -125,20 +125,30 @@ def recommend_content(movie_title):
 #     return hybrid_recs
 
 # Load Ratings Data
+
 def load_data():
+    # Load ratings data
     ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
     columns = ["userId", "movieId", "rating", "timestamp"]
     df = pd.read_csv(ratings_path, sep="\t", names=columns)
 
+    # Load movies data
     movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
     movie_columns = ["movieId", "title"]
     movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
 
+    # Convert movieId to integer in both dataframes
+    df["movieId"] = df["movieId"].astype(int)
+    movies_df["movieId"] = movies_df["movieId"].astype(int)
+
+    # Merge the datasets
     df = df.merge(movies_df, on="movieId")
-    
+
     return df, movies_df
 
+# Load data
 df, movies_df = load_data()
+
 
 # Create a User-Item Interaction Matrix
 pivot_table = df.pivot(index="userId", columns="title", values="rating").fillna(0)
