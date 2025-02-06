@@ -10,8 +10,8 @@ from scipy.sparse import csr_matrix
 from implicit.als import AlternatingLeastSquares
 
 # Load dataset
-movies = pd.read_csv('/kaggle/input/tmdb-movie-metadata/tmdb_5000_movies.csv')
-credits = pd.read_csv('/kaggle/input/tmdb-movie-metadata/tmdb_5000_credits.csv')
+movies = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/tmdb_5000_movies.csv')
+credits = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/compressed_data.csv.gz')
 
 # Merge datasets
 movies = movies.merge(credits, on='title')
