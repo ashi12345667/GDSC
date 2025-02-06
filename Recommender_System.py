@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.sparse import csr_matrix
 from implicit.als import AlternatingLeastSquares
+from sklearn.neighbors import NearestNeighbors
 
 # Load dataset
 file_url1 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/tmdb_5000_movies.csv"
@@ -123,54 +124,48 @@ def recommend_content(movie_title):
 #     hybrid_recs = list(set(content_recs + list(cf_recs)))[:num_recommendations]
 #     return hybrid_recs
 
-import pandas as pd
-from surprise import Dataset, Reader, SVD
-from surprise.model_selection import train_test_split
-from surprise import accuracy
-
 # Load Ratings Data
-ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
-columns = ["userId", "movieId", "rating", "timestamp"]
-df = pd.read_csv(ratings_path, sep="\t", names=columns)
+def load_data():
+    ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
+    columns = ["userId", "movieId", "rating", "timestamp"]
+    df = pd.read_csv(ratings_path, sep="\t", names=columns)
 
-# Load Movie Titles
-movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
-movie_columns = ["movieId", "title"]
-movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
+    movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
+    movie_columns = ["movieId", "title"]
+    movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
 
-# Merge Ratings with Movie Titles
-df = df.merge(movies_df, on="movieId")
-
-# Define Reader
-reader = Reader(rating_scale=(1, 5))
-data = Dataset.load_from_df(df[['userId', 'movieId', 'rating']], reader)
-
-# Train-test split
-trainset, testset = train_test_split(data, test_size=0.2, random_state=42)
-
-# Train SVD Model
-model = SVD()
-model.fit(trainset)
-
-# Evaluate Model
-predictions = model.test(testset)
-rmse = accuracy.rmse(predictions)
-print(f"RMSE: {rmse}")
-
-# Function to Recommend Movies with Titles
-def get_movie_recommendations(user_id, df, model, n=10):
-    unique_movies = df['movieId'].unique()
-    watched_movies = df[df['userId'] == user_id]['movieId'].tolist()
-    unseen_movies = [movie for movie in unique_movies if movie not in watched_movies]
+    df = df.merge(movies_df, on="movieId")
     
-    predictions = [model.predict(user_id, movie) for movie in unseen_movies]
-    predictions.sort(key=lambda x: x.est, reverse=True)
+    return df, movies_df
+
+df, movies_df = load_data()
+
+# Create a User-Item Interaction Matrix
+pivot_table = df.pivot(index="userId", columns="title", values="rating").fillna(0)
+
+# Compute Cosine Similarity
+cosine_sim = cosine_similarity(pivot_table)
+
+# KNN Model
+knn = NearestNeighbors(metric="cosine", algorithm="brute", n_neighbors=10)
+knn.fit(pivot_table)
+
+def recommend_cf(user_id, n=10):
+    user_index = user_id - 1  # Adjust for zero-indexing
+    distances, indices = knn.kneighbors([pivot_table.iloc[user_index]], n_neighbors=n+1)
     
-    top_movies = predictions[:n]
+    # Get similar users
+    similar_users = indices.flatten()[1:]
     
-    # Convert movie IDs to Titles
-    movie_titles = [(movies_df[movies_df['movieId'] == pred.iid]['title'].values[0], pred.est) for pred in top_movies]
-    return movie_titles
+    # Find movies watched by similar users
+    recommended_movies = []
+    for sim_user in similar_users:
+        top_movies = df[df["userId"] == sim_user]["title"].value_counts().index[:3]
+        recommended_movies.extend(top_movies)
+    
+    return list(set(recommended_movies))[:n]
+
+
 
 # Example: Get top 10 movie recommendations for user 1
 # user_id = 1
@@ -202,20 +197,21 @@ if rec_type == "Content-Based":
 #         for movie in recommendations:
 #             st.write(f"✅ {movie}")
 
-elif rec_type == "Collaborative (Implicit)":
+
+elif rec_type == "Collaborative (KNN)":
     user_id = st.number_input("Enter User ID", min_value=1, max_value=int(df['userId'].max()), step=1)
     if st.button("Recommend"):
-        recommendations2 = get_movie_recommendations(user_id, df, model, n=5)
+        recommendations2 = recommend_cf(user_id)
         st.write("### Recommended Movies:")
-        for movie, rating in recommendations2:
-            st.write(f"✅ {movie} (Predicted Rating: {rating:.2f})")
+        for movie in recommendations2:
+            st.write(f"✅ {movie}")
 
 elif rec_type == "Hybrid":
     user_id = st.number_input("Enter User ID", min_value=1, max_value=int(interaction_matrix['user_id'].max()), step=1)
     movie_title = st.selectbox("Select a Movie", movies['title'].values)
     if st.button("Recommend"):
-        recommendations = hybrid_recommendation(user_id, movie_title)
+        recommendations3 = hybrid_recommendation(user_id, movie_title)
         st.write("### Recommended Movies:")
-        for movie in recommendations:
+        for movie in recommendations3:
             st.write(f"✅ {movie}")
 
