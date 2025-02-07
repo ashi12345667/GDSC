@@ -19,7 +19,7 @@ def load_data():
     # Load movies data
     movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
     movie_columns = ["movieId", "title"]
-    movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns
+    movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
 
     df.dropna(inplace=True)  # Remove rows with NaN
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis=1)]  # Remove rows with NaN or Inf
