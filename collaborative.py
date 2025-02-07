@@ -48,7 +48,6 @@ def get_user_based_recommendations(user_id, user_item_matrix, user_similarity, m
     return [movie_dict[movie_id] for movie_id in recommended_movies[:n_recommendations]]
 
 import streamlit as st
-from model import load_data, create_user_item_matrix, compute_similarity, get_user_based_recommendations
 
 # Load Data
 df, item_df = load_data()
