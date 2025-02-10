@@ -166,17 +166,11 @@ user_item_matrix = create_user_item_matrix(df)
 user_similarity = compute_similarity(user_item_matrix)
 
 # Streamlit UI
-st.title("🎬 Movie Recommendation System")
-st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
+# st.title("🎬 Movie Recommendation System")
+# st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
 
 # User Input
-user_id = st.number_input("Enter User ID (1-943):", min_value=1, max_value=943, step=1)
 
-if st.button("Get Recommendations"):
-    recommendations = get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, 5)
-    st.subheader("Recommended Movies:")
-    for i, movie in enumerate(recommendations, 1):
-        st.write(f"{i}. {movie}")
 
 
 
@@ -195,29 +189,12 @@ if rec_type == "Content-Based":
         for movie in recommendations1:
             st.write(f"✅ {movie}")
 
-# elif rec_type == "Collaborative (Implicit)":
-#     user_id = st.number_input("Enter User ID", min_value=1, max_value=int(interaction_matrix['user_id'].max()), step=1)
-#     if st.button("Recommend"):
-#         recommendations = recommend_cf(user_id)
-#         st.write("### Recommended Movies:")
-#         for movie in recommendations:
-#             st.write(f"✅ {movie}")
-
 
 elif rec_type == "Collaborative (KNN)":
-    user_id = st.number_input("Enter User ID", min_value=1, max_value=int(df['userId'].max()), step=1)
-    if st.button("Recommend"):
-        recommendations2 = recommend_cf(user_id)
-        st.write("### Recommended Movies:")
-        for movie in recommendations2:
-            st.write(f"✅ {movie}")
-
-elif rec_type == "Hybrid":
-    user_id = st.number_input("Enter User ID", min_value=1, max_value=int(interaction_matrix['user_id'].max()), step=1)
-    movie_title = st.selectbox("Select a Movie", movies['title'].values)
-    if st.button("Recommend"):
-        recommendations3 = hybrid_recommendation(user_id, movie_title)
-        st.write("### Recommended Movies:")
-        for movie in recommendations3:
-            st.write(f"✅ {movie}")
-
+    user_id = st.number_input("Enter User ID (1-943):", min_value=1, max_value=943, step=1)
+    if st.button("Get Recommendations"):
+        recommendations = get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, 5)
+        st.subheader("Recommended Movies:")
+        for i, movie in enumerate(recommendations, 1):
+            st.write(f"{i}. {movie}")
+   
