@@ -1,29 +1,29 @@
-#GDSC 
-##MOVIE RECOMMENDATION SYSTEM:
+# GDSC 
+## MOVIE RECOMMENDATION SYSTEM:
 
-###Task Description:
+### Task Description:
 
 Develop a Movie Recommendation System using Content-Based Filtering and User-Based Collaborative Filtering.
 
-###1) *Content-Based Filtering:*
+### 1) *Content-Based Filtering:*
 
 Extract and preprocess movie metadata (genres, cast, crew, keywords, overview).
  - Convert textual data into numerical representations using TF-IDF and Cosine Similarity.
  - Recommend similar movies based on the selected movie.
 
 
-###2) *User-Based Collaborative Filtering:*
+### 2) *User-Based Collaborative Filtering:*
  - Load and preprocess the MovieLens 100K dataset.
  - Construct a User-Item Interaction Matrix and compute User Similarity using Cosine Similarity.
  -Ge nerate personalized movie recommendations for a given user based on similar users' preferences.
 
 
-###3) *Interactive Streamlit Web App:*
+### 3) *Interactive Streamlit Web App:*
 
  - Provide a UI for users to choose between Content-Based and Collaborative Filtering methods.
  - Allow users to input a movie title or user ID and receive movie recommendations.
 
-###INSTRUCTIONS TO RUN THE PROJECT:
+### INSTRUCTIONS TO RUN THE PROJECT:
 
  - Through streamlit website, choose create app option.
  - Choose "deploy a public app from github".
