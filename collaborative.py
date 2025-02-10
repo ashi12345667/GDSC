@@ -24,9 +24,22 @@ def create_user_item_matrix(df):
     return user_item_matrix
 
 # Compute user similarity
+# def compute_similarity(user_item_matrix):
+#     user_similarity = cosine_similarity(user_item_matrix)
+#     return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
+
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
 def compute_similarity(user_item_matrix):
+    if user_item_matrix.shape[0] == 0 or user_item_matrix.shape[1] == 0:
+        print("Error: Empty user-item matrix. Cannot compute similarity.")
+        return pd.DataFrame()  # Return an empty DataFrame to avoid crashing
+    
     user_similarity = cosine_similarity(user_item_matrix)
+    
     return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
+
 
 # Get recommendations
 def get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, n_recommendations=5):
