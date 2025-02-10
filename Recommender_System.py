@@ -17,9 +17,6 @@ movies = pd.read_csv(file_url1)
 file_url2 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/compressed_data.csv.gz"
 credits = pd.read_csv(file_url2)
 
-# movies = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/tmdb_5000_movies.csv')
-# credits = pd.read_csv('https://github.com/ashi12345667/GDSC/blob/main/compressed_data.csv.gz')
-
 # Merge datasets
 movies = movies.merge(credits, on='title')
 movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
@@ -165,14 +162,6 @@ movie_dict = dict(zip(item_df['movie_id'], item_df['movie_title']))
 user_item_matrix = create_user_item_matrix(df)
 user_similarity = compute_similarity(user_item_matrix)
 
-# Streamlit UI
-# st.title("🎬 Movie Recommendation System")
-# st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
-
-# User Input
-
-
-
 
 
 import streamlit as st
@@ -198,5 +187,5 @@ elif rec_type == "Collaborative (KNN)":
         recommendations = get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, 5)
         st.subheader("Recommended Movies:")
         for i, movie in enumerate(recommendations, 1):
-            st.write(f"{i}. {movie}")
+             st.write(f"✅ {movie}")
        
