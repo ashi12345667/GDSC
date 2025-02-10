@@ -126,61 +126,61 @@ def recommend_content(movie_title):
 
 # Load Ratings Data
 
-def load_data():
-    # Load ratings data
-    ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
-    columns = ["userId", "movieId", "rating", "timestamp"]
-    df = pd.read_csv(ratings_path, sep="\t", names=columns)
+# def load_data():
+#     # Load ratings data
+#     ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
+#     columns = ["userId", "movieId", "rating", "timestamp"]
+#     df = pd.read_csv(ratings_path, sep="\t", names=columns)
 
-    # Load movies data
-    movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
-    movie_columns = ["movieId", "title"]
-    movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
+#     # Load movies data
+#     movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
+#     movie_columns = ["movieId", "title"]
+#     movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
 
-    # Convert movieId to integer in both dataframes
-    df["movieId"] = df["movieId"].astype(int)
-    movies_df["movieId"] = movies_df["movieId"].astype(int)
+#     # Convert movieId to integer in both dataframes
+#     df["movieId"] = df["movieId"].astype(int)
+#     movies_df["movieId"] = movies_df["movieId"].astype(int)
 
-    # Merge the datasets
-    df = df.merge(movies_df, on="movieId")
+#     # Merge the datasets
+#     df = df.merge(movies_df, on="movieId")
 
-    return df, movies_df
+#     return df, movies_df
 
-# Load data
-df, movies_df = load_data()
+# # Load data
+# df, movies_df = load_data()
 
 
-# Create a User-Item Interaction Matrix
-pivot_table = df.pivot(index="userId", columns="title", values="rating").fillna(0)
+# # Create a User-Item Interaction Matrix
+# pivot_table = df.pivot(index="userId", columns="title", values="rating").fillna(0)
 
-# Compute Cosine Similarity
-cosine_sim = cosine_similarity(pivot_table)
+# # Compute Cosine Similarity
+# cosine_sim = cosine_similarity(pivot_table)
 
-# KNN Model
-knn = NearestNeighbors(metric="cosine", algorithm="brute", n_neighbors=10)
-knn.fit(pivot_table)
+# # KNN Model
+# knn = NearestNeighbors(metric="cosine", algorithm="brute", n_neighbors=10)
+# knn.fit(pivot_table)
 
-def recommend_cf(user_id, n=10):
-    user_index = user_id - 1  # Adjust for zero-indexing
-    distances, indices = knn.kneighbors([pivot_table.iloc[user_index]], n_neighbors=n+1)
+# def recommend_cf(user_id, n=10):
+#     user_index = user_id - 1  # Adjust for zero-indexing
+#     distances, indices = knn.kneighbors([pivot_table.iloc[user_index]], n_neighbors=n+1)
     
-    # Get similar users
-    similar_users = indices.flatten()[1:]
+#     # Get similar users
+#     similar_users = indices.flatten()[1:]
     
-    # Find movies watched by similar users
-    recommended_movies = []
-    for sim_user in similar_users:
-        top_movies = df[df["userId"] == sim_user]["title"].value_counts().index[:3]
-        recommended_movies.extend(top_movies)
+#     # Find movies watched by similar users
+#     recommended_movies = []
+#     for sim_user in similar_users:
+#         top_movies = df[df["userId"] == sim_user]["title"].value_counts().index[:3]
+#         recommended_movies.extend(top_movies)
     
-    return list(set(recommended_movies))[:n]
+#     return list(set(recommended_movies))[:n]
 
 
 
-# Example: Get top 10 movie recommendations for user 1
-# user_id = 1
-# recommendations = get_movie_recommendations(user_id, df, model, n=5)
-# print("Top 5 Recommended Movies with Titles:\n", recommendations)
+# # Example: Get top 10 movie recommendations for user 1
+# # user_id = 1
+# # recommendations = get_movie_recommendations(user_id, df, model, n=5)
+# # print("Top 5 Recommended Movies with Titles:\n", recommendations)
 
 
 
