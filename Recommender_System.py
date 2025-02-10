@@ -179,7 +179,7 @@ import streamlit as st
 st.title("🎬 Movie Recommender System")
 
 st.sidebar.header("Choose Recommendation Type")
-rec_type = st.sidebar.selectbox("Select Type", ["Content-Based", "Collaborative (Implicit)", "Hybrid"])
+rec_type = st.sidebar.selectbox("Select Type", ["Content-Based", "Collaborative (KNN)"])
 
 if rec_type == "Content-Based":
     movie_title = st.selectbox("Select a Movie", movies['title'].values)
@@ -191,7 +191,6 @@ if rec_type == "Content-Based":
 
 
 elif rec_type == "Collaborative (KNN)":
-    st.title("🎬 Movie Recommendation System")
     st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
     user_id = st.number_input("Enter User ID (1-943):", min_value=1, max_value=943, step=1)
     
