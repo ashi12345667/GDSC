@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pickle
 import ast
 import nltk
 from nltk.stem.porter import PorterStemmer
@@ -10,17 +9,21 @@ from scipy.sparse import csr_matrix
 from implicit.als import AlternatingLeastSquares
 from sklearn.neighbors import NearestNeighbors
 
+
 # Load dataset
 file_url1 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/tmdb_5000_movies.csv"
 movies = pd.read_csv(file_url1)
 
+
 file_url2 = "https://raw.githubusercontent.com/ashi12345667/GDSC/main/compressed_data.csv.gz"
 credits = pd.read_csv(file_url2)
+
 
 # Merge datasets
 movies = movies.merge(credits, on='title')
 movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
 movies.dropna(inplace=True)
+
 
 # Convert genres, keywords, cast, crew from JSON-like format to lists
 def convert_string(object):
@@ -32,6 +35,7 @@ def convert_string(object):
 movies['genres'] = movies['genres'].apply(convert_string)
 movies['keywords'] = movies['keywords'].apply(convert_string)
 
+
 # Extract top 3 cast members
 def convert_cast(object):
     L = []
@@ -40,6 +44,7 @@ def convert_cast(object):
     return L
 
 movies['cast'] = movies['cast'].apply(convert_cast)
+
 
 # Extract director name
 def convert_crew(object):
@@ -50,27 +55,30 @@ def convert_crew(object):
 
 movies['crew'] = movies['crew'].apply(convert_crew)
 
+
 # Process overview, genres, cast, crew, and keywords
 movies['overview'] = movies['overview'].apply(lambda x: x.split() if isinstance(x, str) else [])
 movies['keywords'] = movies['keywords'].apply(lambda x: [i.replace(" ", "") for i in x])
 movies['cast'] = movies['cast'].apply(lambda x: [i.replace(" ", "") for i in x])
 movies['crew'] = movies['crew'].apply(lambda x: [i.replace(" ", "") for i in x])
 
+
 # Create a new feature 'tags' combining important text-based features
 movies['tags'] = movies['overview'] + movies['keywords'] + movies['cast'] + movies['crew'] + movies['genres']
+
 
 # Prepare final DataFrame
 new_df = movies[['movie_id', 'title', 'tags']]
 new_df['tags'] = new_df['tags'].apply(lambda x: " ".join(x))
 new_df['tags'] = new_df['tags'].apply(lambda x: x.lower())
 
+
 # Stemming for better text matching
 ps = PorterStemmer()
-
 def stem(text):
     return " ".join([ps.stem(word) for word in text.split()])
-
 new_df['tags'] = new_df['tags'].apply(stem)
+
 
 # Convert tags to numerical vectors
 cv = CountVectorizer(max_features=5000, stop_words='english')
@@ -90,11 +98,7 @@ def recommend_content(movie_title):
 
     return [new_df.iloc[i[0]].title for i in movies_list]
 
-# ---------------- IMPLICIT COLLABORATIVE FILTERING ----------------
-
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-
+# IMPLICIT COLLABORATIVE FILTERING
 # Load Data
 def load_data():
     file_paths = {
@@ -112,18 +116,13 @@ def load_data():
 
     return df, item_df
 
+
 # Create user-item matrix
 def create_user_item_matrix(df):
     user_item_matrix = df.pivot_table(index='user_id', columns='item_id', values='rating', fill_value=0)
     return user_item_matrix
+    return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
 
-# Compute user similarity
-# def compute_similarity(user_item_matrix):
-#     user_similarity = cosine_similarity(user_item_matrix)
-#     return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
-
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
 
 def compute_similarity(user_item_matrix):
     if user_item_matrix.shape[0] == 0 or user_item_matrix.shape[1] == 0:
@@ -131,7 +130,6 @@ def compute_similarity(user_item_matrix):
         return pd.DataFrame()  # Return an empty DataFrame to avoid crashing
     
     user_similarity = cosine_similarity(user_item_matrix)
-    
     return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
 
 
@@ -163,7 +161,7 @@ user_item_matrix = create_user_item_matrix(df)
 user_similarity = compute_similarity(user_item_matrix)
 
 
-
+# Streamlit UI for interactive user input
 import streamlit as st
 st.title("🎬 Movie Recommender System")
 
