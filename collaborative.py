@@ -77,7 +77,7 @@ st.sidebar.header("Choose Recommendation Type")
 rec_type = st.sidebar.selectbox("Select Type", ["Content-Based", "Collaborative (KNN)"])
 
 if rec_type == "Content-Based":
-    movie_title = st.selectbox("Select a Movie", movies['title'].values)
+    movie_title = st.selectbox("Select a Movie", movie['title'].values)
     if st.button("Recommend"):
         recommendations1 = recommend_content(movie_title)
         st.write("### Recommended Movies:")
