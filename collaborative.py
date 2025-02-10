@@ -4,8 +4,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Load Data
 def load_data():
     file_paths = {
-        'u_data': 'https://github.com/ashi12345667/GDSC/blob/main/u.data',
-        'u_item': 'https://github.com/ashi12345667/GDSC/blob/main/u.item',
+    'u_data': 'https://raw.githubusercontent.com/ashi12345667/GDSC/main/u.data',
+    'u_item': 'https://raw.githubusercontent.com/ashi12345667/GDSC/main/u.item',
     }
 
     # Load ratings data
