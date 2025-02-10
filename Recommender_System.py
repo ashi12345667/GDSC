@@ -191,11 +191,13 @@ if rec_type == "Content-Based":
 
 
 elif rec_type == "Collaborative (KNN)":
+    st.title("🎬 Movie Recommendation System")
     st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
     user_id = st.number_input("Enter User ID (1-943):", min_value=1, max_value=943, step=1)
+    
     if st.button("Get Recommendations"):
         recommendations = get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, 5)
         st.subheader("Recommended Movies:")
         for i, movie in enumerate(recommendations, 1):
             st.write(f"{i}. {movie}")
-   
+       
