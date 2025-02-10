@@ -28,16 +28,16 @@ Extract and preprocess movie metadata (genres, cast, crew, keywords, overview).
  - Through streamlit website, choose create app option.
  - Choose "deploy a public app from github".
  - Then paste GITHUB URL- "https://github.com/ashi12345667/GDSC".
- - Choose "Recommender_system(Task 1)" in Main file path.
+ - Choose "Recommender_system" in Main file path.
  - Click on deploy.
 
- - choose conten or collaborative filtering according to your preference from the side bar.
+ - choose content or collaborative filtering according to your preference from the side bar.
  - For content based filtering, select the movie for which you want recommendations or similar movie.
  - For collaborative filtering (user based), select the user id.
- -  Click on GET RECOMMENDATION.
+ - Click on GET RECOMMENDATION.
  - You will get top 5 movies similar to choosen movie(in case of contet based filtering) OR user prefernce movie(collaborative filtering).
 
 
- URL-"https://35h7jt53m5n2isq4bnozku.streamlit.app/"
+ 
 
  
