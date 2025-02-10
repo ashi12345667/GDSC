@@ -95,92 +95,88 @@ def recommend_content(movie_title):
 
 # ---------------- IMPLICIT COLLABORATIVE FILTERING ----------------
 
-# Simulate user interactions (implicit feedback)
-# user_ids = np.random.randint(1, 100, size=len(movies))
-# interaction_matrix = pd.DataFrame({'user_id': user_ids, 'movie_id': movies['movie_id']})
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
-# # Create sparse interaction matrix
-# sparse_matrix = csr_matrix((np.ones(len(interaction_matrix)), 
-#                             (interaction_matrix['user_id'], interaction_matrix['movie_id'])))
+# Load Data
+def load_data():
+    file_paths = {
+    'u_data': 'https://raw.githubusercontent.com/ashi12345667/GDSC/main/u.data',
+    'u_item': 'https://raw.githubusercontent.com/ashi12345667/GDSC/main/u.item',
+    }
 
-# # Train ALS model
-# model = AlternatingLeastSquares(factors=50, regularization=0.1)
-# model.fit(sparse_matrix.T)
+    # Load ratings data
+    df = pd.read_csv(file_paths['u_data'], sep='\t', names=['user_id', 'item_id', 'rating', 'timestamp'])
+    df = df.drop(columns=['timestamp'])
 
-# # Collaborative Filtering Recommendation
-# def recommend_cf(user_id, num_recommendations=5):
-#     if user_id not in interaction_matrix['user_id'].values:
-#         return ["User not found. Try another ID."]
+    # Load movie info
+    item_df = pd.read_csv(file_paths['u_item'], sep='|', encoding='latin-1', header=None,
+                          names=['movie_id', 'movie_title'], usecols=[0, 1])
+
+    return df, item_df
+
+# Create user-item matrix
+def create_user_item_matrix(df):
+    user_item_matrix = df.pivot_table(index='user_id', columns='item_id', values='rating', fill_value=0)
+    return user_item_matrix
+
+# Compute user similarity
+# def compute_similarity(user_item_matrix):
+#     user_similarity = cosine_similarity(user_item_matrix)
+#     return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
+
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
+def compute_similarity(user_item_matrix):
+    if user_item_matrix.shape[0] == 0 or user_item_matrix.shape[1] == 0:
+        print("Error: Empty user-item matrix. Cannot compute similarity.")
+        return pd.DataFrame()  # Return an empty DataFrame to avoid crashing
     
-#     recommendations = model.recommend(user_id, sparse_matrix, N=num_recommendations)
-#     return movies[movies['movie_id'].isin([rec[0] for rec in recommendations])]['title'].values
-
-# # ---------------- HYBRID RECOMMENDATION ----------------
-
-# def hybrid_recommendation(user_id, movie_title, num_recommendations=5):
-#     content_recs = recommend_content(movie_title)
-#     cf_recs = recommend_cf(user_id, num_recommendations)
+    user_similarity = cosine_similarity(user_item_matrix)
     
-#     hybrid_recs = list(set(content_recs + list(cf_recs)))[:num_recommendations]
-#     return hybrid_recs
-
-# Load Ratings Data
-
-# def load_data():
-#     # Load ratings data
-#     ratings_path = "https://github.com/ashi12345667/GDSC/blob/main/u.data"
-#     columns = ["userId", "movieId", "rating", "timestamp"]
-#     df = pd.read_csv(ratings_path, sep="\t", names=columns)
-
-#     # Load movies data
-#     movies_path = "https://github.com/ashi12345667/GDSC/blob/main/u.item"
-#     movie_columns = ["movieId", "title"]
-#     movies_df = pd.read_csv(movies_path, sep="|", encoding="latin-1", usecols=[0, 1], names=movie_columns)
-
-#     # Convert movieId to integer in both dataframes
-#     df["movieId"] = df["movieId"].astype(int)
-#     movies_df["movieId"] = movies_df["movieId"].astype(int)
-
-#     # Merge the datasets
-#     df = df.merge(movies_df, on="movieId")
-
-#     return df, movies_df
-
-# # Load data
-# df, movies_df = load_data()
+    return pd.DataFrame(user_similarity, index=user_item_matrix.index, columns=user_item_matrix.index)
 
 
-# # Create a User-Item Interaction Matrix
-# pivot_table = df.pivot(index="userId", columns="title", values="rating").fillna(0)
+# Get recommendations
+def get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, n_recommendations=5):
+    if user_id not in user_similarity.index:
+        return ["No recommendations available"]
 
-# # Compute Cosine Similarity
-# cosine_sim = cosine_similarity(pivot_table)
+    similar_users = user_similarity[user_id].sort_values(ascending=False).index[1:]
+    watched_movies = user_item_matrix.loc[user_id][user_item_matrix.loc[user_id] != 0].index
 
-# # KNN Model
-# knn = NearestNeighbors(metric="cosine", algorithm="brute", n_neighbors=10)
-# knn.fit(pivot_table)
+    recommended_movies = []
+    for sim_user in similar_users:
+        sim_user_ratings = user_item_matrix.loc[sim_user]
+        highly_rated_movies = sim_user_ratings[sim_user_ratings >= 4]
+        recommendations = highly_rated_movies[~highly_rated_movies.index.isin(watched_movies)]
+        recommended_movies.extend(recommendations.index.tolist())
+        if len(recommended_movies) >= n_recommendations:
+            break
 
-# def recommend_cf(user_id, n=10):
-#     user_index = user_id - 1  # Adjust for zero-indexing
-#     distances, indices = knn.kneighbors([pivot_table.iloc[user_index]], n_neighbors=n+1)
-    
-#     # Get similar users
-#     similar_users = indices.flatten()[1:]
-    
-#     # Find movies watched by similar users
-#     recommended_movies = []
-#     for sim_user in similar_users:
-#         top_movies = df[df["userId"] == sim_user]["title"].value_counts().index[:3]
-#         recommended_movies.extend(top_movies)
-    
-#     return list(set(recommended_movies))[:n]
+    return [movie_dict[movie_id] for movie_id in recommended_movies[:n_recommendations]]
 
+import streamlit as st
 
+# Load Data
+df, item_df = load_data()
+movie_dict = dict(zip(item_df['movie_id'], item_df['movie_title']))
+user_item_matrix = create_user_item_matrix(df)
+user_similarity = compute_similarity(user_item_matrix)
 
-# # Example: Get top 10 movie recommendations for user 1
-# # user_id = 1
-# # recommendations = get_movie_recommendations(user_id, df, model, n=5)
-# # print("Top 5 Recommended Movies with Titles:\n", recommendations)
+# Streamlit UI
+st.title("🎬 Movie Recommendation System")
+st.write("User-Based Collaborative Filtering on MovieLens 100K Dataset")
+
+# User Input
+user_id = st.number_input("Enter User ID (1-943):", min_value=1, max_value=943, step=1)
+
+if st.button("Get Recommendations"):
+    recommendations = get_user_based_recommendations(user_id, user_item_matrix, user_similarity, movie_dict, 5)
+    st.subheader("Recommended Movies:")
+    for i, movie in enumerate(recommendations, 1):
+        st.write(f"{i}. {movie}")
 
 
 
