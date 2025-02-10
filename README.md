@@ -15,13 +15,13 @@ Extract and preprocess movie metadata (genres, cast, crew, keywords, overview).
 ### 2) *User-Based Collaborative Filtering:*
  - Load and preprocess the MovieLens 100K dataset.
  - Construct a User-Item Interaction Matrix and compute User Similarity using Cosine Similarity.
- -Ge nerate personalized movie recommendations for a given user based on similar users' preferences.
+ - Generate personalized movie recommendations for a given user based on similar users' preferences.
 
 
 ### 3) *Interactive Streamlit Web App:*
 
- - Provide a UI for users to choose between Content-Based and Collaborative Filtering methods.
- - Allow users to input a movie title or user ID and receive movie recommendations.
+ - Provide a UI to choose between Content-Based and Collaborative Filtering methods.
+ - Allow us to input a movie title or user ID and receive movie recommendations.
 
 ### INSTRUCTIONS TO RUN THE PROJECT:
 
