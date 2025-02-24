@@ -6,7 +6,6 @@ from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.sparse import csr_matrix
-from implicit.als import AlternatingLeastSquares
 from sklearn.neighbors import NearestNeighbors
 
 
